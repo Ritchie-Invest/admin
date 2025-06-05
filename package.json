@@ -1,5 +1,8 @@
 {
   "name": "ritchie-invest-admin",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "private": true,
   "version": "0.0.0",
   "type": "module",
