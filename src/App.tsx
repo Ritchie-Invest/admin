@@ -1,8 +1,13 @@
 import Dashboard from '@/pages/dashboard.tsx';
 import Login from '@/pages/login.tsx';
-import { BrowserRouter, Route, Routes, Navigate, useLocation } from 'react-router';
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { JSX, useEffect, useState } from 'react';
 import { refresh, AuthTokens } from '@/services/auth.service';
+import { ChapterPage } from '@/pages/chapter.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppLayout } from '@/components/app-layout';
+
+const queryClient = new QueryClient();
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const [authChecked, setAuthChecked] = useState(false);
@@ -50,16 +55,27 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={
-          <RequireAuth>
-            <Dashboard />
-          </RequireAuth>
-        } />
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={
+            <RequireAuth>
+              <AppLayout>
+                <Dashboard />
+              </AppLayout>
+            </RequireAuth>
+          } />
+          <Route path="/chapters/:chapterId" element={
+            <RequireAuth>
+              <AppLayout>
+                <ChapterPage />
+              </AppLayout>
+            </RequireAuth>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
