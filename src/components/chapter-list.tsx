@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Chapter, getChapters, createChapter } from '@/services/chapter.service';
 import {
   Dialog,
@@ -14,43 +15,43 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Link } from 'react-router-dom';
 
 export function ChapterList() {
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { data: chapters = [], isLoading, error } = useQuery({
+    queryKey: ['chapters'],
+    queryFn: getChapters,
+  });
+  const createChapterMutation = useMutation({
+    mutationFn: createChapter,
+    onSuccess: (newChapter) => {
+      queryClient.setQueryData(['chapters'], (old: Chapter[] = []) => [...old, newChapter]);
+    },
+  });
   const [modalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-
-  useEffect(() => {
-    getChapters()
-      .then(setChapters)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
 
   async function handleCreate(e?: React.FormEvent) {
     if (e) e.preventDefault();
     setFormError(null);
-    setCreating(true);
-    try {
-      const newChapter = await createChapter({ title, description });
-      setChapters((prev) => [...prev, newChapter]);
-      setModalOpen(false);
-      setTitle('');
-      setDescription('');
-    } catch (e: any) {
-      setFormError(e.message || 'Error creating chapter');
-    } finally {
-      setCreating(false);
-    }
+    createChapterMutation.mutate(
+      { title, description },
+      {
+        onSuccess: () => {
+          setModalOpen(false);
+          setTitle('');
+          setDescription('');
+        },
+        onError: (e: any) => setFormError(e.message || 'Error creating chapter'),
+      }
+    );
   }
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-600">Error: {error}</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-600">Error: {error?.toString()}</div>;
 
   return (
     <div>
@@ -59,13 +60,13 @@ export function ChapterList() {
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogTrigger asChild>
             <Button className="bg-black text-white">
-              + Créer
+              + Ajouter un chapitre
             </Button>
           </DialogTrigger>
           <DialogContent>
             <form onSubmit={handleCreate} className="flex flex-col gap-4">
               <DialogHeader>
-                <DialogTitle>Créer un chapitre</DialogTitle>
+                <DialogTitle>Ajouter un chapitre</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="chapter-title">Titre</Label>
@@ -74,7 +75,7 @@ export function ChapterList() {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   required
-                  disabled={creating}
+                  disabled={createChapterMutation.isPending}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -84,18 +85,18 @@ export function ChapterList() {
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   required
-                  disabled={creating}
+                  disabled={createChapterMutation.isPending}
                 />
               </div>
               {formError && <div className="text-red-500 text-sm">{formError}</div>}
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline" disabled={creating}>
+                  <Button type="button" variant="outline" disabled={createChapterMutation.isPending}>
                     Annuler
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={creating}>
-                  {creating ? 'Création...' : 'Créer'}
+                <Button type="submit" disabled={createChapterMutation.isPending}>
+                  {createChapterMutation.isPending ? 'Création...' : 'Créer'}
                 </Button>
               </DialogFooter>
             </form>
@@ -105,8 +106,10 @@ export function ChapterList() {
       <ul className="space-y-2">
         {chapters.map((chapter) => (
           <li key={chapter.id} className="border p-4 rounded">
-            <div className="font-semibold">{chapter.title}</div>
-            <div className="text-sm text-gray-600">{chapter.description}</div>
+            <Link to={`/chapters/${chapter.id}`} className="block hover:underline">
+              <div className="font-semibold">{chapter.title}</div>
+              <div className="text-sm text-gray-600">{chapter.description}</div>
+            </Link>
           </li>
         ))}
       </ul>

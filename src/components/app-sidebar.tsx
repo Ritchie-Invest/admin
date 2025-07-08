@@ -22,7 +22,7 @@ const data = {
   courses: [
     {
       name: 'Chapitres',
-      url: '/#',
+      url: '/',
       icon: IconDatabase,
     },
   ],
