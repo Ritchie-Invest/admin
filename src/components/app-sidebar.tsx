@@ -21,7 +21,7 @@ const data = {
   },
   courses: [
     {
-      name: 'Chapters',
+      name: 'Chapitres',
       url: '/#',
       icon: IconDatabase,
     },
