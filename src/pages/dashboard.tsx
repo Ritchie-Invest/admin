@@ -1,4 +1,5 @@
 import { AppSidebar } from '@/components/app-sidebar';
+import { ChapterList } from '@/components/chapter-list';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
@@ -18,7 +19,7 @@ export default function Dashboard() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
-              <div>Chapters</div>
+              <ChapterList />
             </div>
           </div>
         </div>
