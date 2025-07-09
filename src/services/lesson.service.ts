@@ -10,7 +10,7 @@ export type Lesson = {
 export async function getLessonsByChapter(
   chapterId: string,
 ): Promise<Lesson[]> {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = sessionStorage.getItem('accessToken');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -31,7 +31,7 @@ export async function createLesson(
   chapterId: string,
   data: LessonFormValues,
 ): Promise<Lesson> {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = sessionStorage.getItem('accessToken');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };

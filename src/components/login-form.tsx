@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
-import { login } from "@/services/auth.service"
+import { useAuth } from "@/hooks/useAuth"
 
 export function LoginForm({
   className,
@@ -26,9 +26,8 @@ export function LoginForm({
     setLoading(true)
     setError(null)
     try {
-      const tokens = await login(email, password)
-      localStorage.setItem("accessToken", tokens.accessToken)
-      localStorage.setItem("refreshToken", tokens.refreshToken)
+      const { login } = useAuth()
+      await login(email, password)
       window.location.href = "/"
     } catch (err) {
       setError("Email ou mot de passe invalide")

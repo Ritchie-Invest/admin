@@ -44,3 +44,114 @@ export async function logout(refreshToken: string): Promise<void> {
   });
   if (!res.ok) throw new Error('Logout failed');
 }
+
+function getAccessToken(): string | null {
+  return sessionStorage.getItem('accessToken');
+}
+
+export function getRefreshToken(): string | null {
+  return localStorage.getItem('refreshToken');
+}
+
+export function setTokens(tokens: AuthTokens) {
+  sessionStorage.setItem('accessToken', tokens.accessToken);
+  localStorage.setItem('refreshToken', tokens.refreshToken);
+}
+
+export function clearTokens() {
+  sessionStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+}
+
+let refreshPromise: Promise<AuthTokens> | null = null;
+
+export async function refreshSafe(): Promise<AuthTokens> {
+  if (!refreshPromise) {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) throw new Error('No refresh token');
+
+    refreshPromise = refresh(refreshToken)
+      .then((tokens) => {
+        setTokens(tokens);
+        return tokens;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+}
+
+export async function fetchWithAuth(
+  input: RequestInfo,
+  init: RequestInit = {},
+): Promise<Response> {
+  if (
+    typeof input === 'string' &&
+    (input.includes('/auth/refresh') || input.includes('/auth/login'))
+  ) {
+    throw new Error(
+      'fetchWithAuth ne doit pas être utilisé pour /auth/refresh ou /auth/login',
+    );
+  }
+
+  let accessToken = getAccessToken();
+  const refreshToken = getRefreshToken();
+
+  if (!accessToken && refreshToken) {
+    try {
+      await refreshSafe();
+      accessToken = getAccessToken();
+    } catch (e) {
+      clearTokens();
+      window.location.href = '/login';
+      throw new Error('Session expirée');
+    }
+  }
+
+  if (!accessToken) {
+    throw new Error('Not authenticated');
+  }
+
+  const baseHeaders =
+    init.headers &&
+    !(init.headers instanceof Headers) &&
+    !Array.isArray(init.headers)
+      ? { ...init.headers }
+      : {};
+
+  const authInit: RequestInit = {
+    ...init,
+    headers: {
+      ...baseHeaders,
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: 'include',
+  };
+
+  let res = await fetch(input, authInit);
+
+  if (res.status === 401 && refreshToken) {
+    try {
+      await refreshSafe();
+      accessToken = getAccessToken();
+    } catch (e) {
+      clearTokens();
+      window.location.href = '/login';
+      throw new Error('Session expirée');
+    }
+
+    const retryInit: RequestInit = {
+      ...authInit,
+      headers: {
+        ...baseHeaders,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    res = await fetch(input, retryInit);
+  }
+
+  return res;
+}
