@@ -13,27 +13,23 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createLesson } from '@/services/lesson.service';
+import { useCreateLesson } from '@/services/lesson.service';
 import { useState } from 'react';
 
 export function LessonCreateDialog({ chapterId }: { chapterId: string }) {
   const [open, setOpen] = useState(false);
-  const queryClient = useQueryClient();
   const form = useForm<LessonFormValues>({
     resolver: zodResolver(lessonSchema),
     defaultValues: { title: '', description: '' },
   });
-  const createLessonMutation = useMutation({
-    mutationFn: (data: LessonFormValues) => createLesson(chapterId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lessons', chapterId] });
-      setOpen(false);
-      form.reset();
-    },
-  });
+  const createLessonMutation = useCreateLesson(chapterId);
   const onSubmit = (values: LessonFormValues) => {
-    createLessonMutation.mutate(values);
+    createLessonMutation.mutate(values, {
+      onSuccess: () => {
+        setOpen(false);
+        form.reset();
+      },
+    });
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>

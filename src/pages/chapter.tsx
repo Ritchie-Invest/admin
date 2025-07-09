@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getChapterById } from '@/services/chapter.service';
-import { getLessonsByChapter } from '@/services/lesson.service';
+import { useLessonsByChapter } from '@/services/lesson.service';
 import { LessonCreateDialog } from '@/components/lesson-create-dialog';
 
 export function ChapterPage() {
@@ -14,11 +14,7 @@ export function ChapterPage() {
     enabled: !!chapterId,
   });
 
-  const lessonsQuery = useQuery({
-    queryKey: ['lessons', chapterId],
-    queryFn: () => getLessonsByChapter(chapterId!),
-    enabled: !!chapterId,
-  });
+  const lessonsQuery = useLessonsByChapter(chapterId);
 
   if (chapterQuery.isLoading || lessonsQuery.isLoading) return <div>Chargement...</div>;
   if (chapterQuery.error || lessonsQuery.error)

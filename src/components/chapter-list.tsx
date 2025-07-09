@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Chapter, getChapters, createChapter } from '@/services/chapter.service';
+import { useChapters, useCreateChapter } from '@/services/chapter.service';
 import {
   Dialog,
   DialogTrigger,
@@ -18,17 +17,8 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 
 export function ChapterList() {
-  const queryClient = useQueryClient();
-  const { data: chapters = [], isLoading, error } = useQuery({
-    queryKey: ['chapters'],
-    queryFn: getChapters,
-  });
-  const createChapterMutation = useMutation({
-    mutationFn: createChapter,
-    onSuccess: (newChapter) => {
-      queryClient.setQueryData(['chapters'], (old: Chapter[] = []) => [...old, newChapter]);
-    },
-  });
+  const { data: chapters = [], isLoading, error } = useChapters();
+  const createChapterMutation = useCreateChapter();
   const [modalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -40,12 +30,12 @@ export function ChapterList() {
     createChapterMutation.mutate(
       { title, description },
       {
+        onError: (err: any) => setFormError(err?.message || 'Erreur inconnue'),
         onSuccess: () => {
           setModalOpen(false);
           setTitle('');
           setDescription('');
         },
-        onError: (e: any) => setFormError(e.message || 'Error creating chapter'),
       }
     );
   }

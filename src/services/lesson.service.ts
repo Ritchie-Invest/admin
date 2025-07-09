@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '@/lib/api';
 import type { LessonFormValues } from '@/schemas/lesson.schema';
 import { fetchWithAuth } from './auth.service';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type Lesson = {
   id: string;
@@ -38,4 +39,22 @@ export async function createLesson(
   });
   if (!res.ok) throw new Error('Failed to create lesson');
   return res.json();
+}
+
+export function useLessonsByChapter(chapterId: string | undefined) {
+  return useQuery({
+    queryKey: ['lessons', chapterId],
+    queryFn: () => getLessonsByChapter(chapterId!),
+    enabled: !!chapterId,
+  });
+}
+
+export function useCreateLesson(chapterId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: LessonFormValues) => createLesson(chapterId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lessons', chapterId] });
+    },
+  });
 }
