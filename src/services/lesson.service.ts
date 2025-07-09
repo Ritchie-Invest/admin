@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '@/lib/api';
 import type { LessonFormValues } from '@/schemas/lesson.schema';
+import { fetchWithAuth } from './auth.service';
 
 export type Lesson = {
   id: string;
@@ -10,16 +11,14 @@ export type Lesson = {
 export async function getLessonsByChapter(
   chapterId: string,
 ): Promise<Lesson[]> {
-  const accessToken = sessionStorage.getItem('accessToken');
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-  const res = await fetch(`${API_BASE_URL}/lessons/chapter/${chapterId}`, {
-    method: 'GET',
-    headers,
-    credentials: 'include',
-  });
+  const res = await fetchWithAuth(
+    `${API_BASE_URL}/lessons/chapter/${chapterId}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    },
+  );
   if (!res.ok) throw new Error('Failed to fetch lessons');
   const data = await res.json();
   if (Array.isArray(data)) return data;
@@ -31,14 +30,9 @@ export async function createLesson(
   chapterId: string,
   data: LessonFormValues,
 ): Promise<Lesson> {
-  const accessToken = sessionStorage.getItem('accessToken');
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-  const res = await fetch(`${API_BASE_URL}/lessons`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/lessons`, {
     method: 'POST',
-    headers,
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify({ ...data, chapterId }),
   });
