@@ -5,6 +5,7 @@ import {
   setTokens,
   clearTokens,
   refreshSafe,
+  getAccessToken,
 } from '@/services/auth.service';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -13,7 +14,7 @@ export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const accessToken = sessionStorage.getItem('accessToken');
+    const accessToken = getAccessToken();
 
     const tryRefresh = async () => {
       try {
@@ -36,9 +37,8 @@ export function useAuth() {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    console.log('Logging in with', { email, password });
     const tokens = await loginApi(email, password);
-    setTokens(tokens);
+    setTokens(tokens.accessToken);
     setIsAuthenticated(true);
   }, []);
 
