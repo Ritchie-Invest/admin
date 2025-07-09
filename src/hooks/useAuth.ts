@@ -4,7 +4,6 @@ import {
   fetchWithAuth,
   setTokens,
   clearTokens,
-  getRefreshToken,
   refreshSafe,
 } from '@/services/auth.service';
 import { useCallback, useEffect, useState } from 'react';
@@ -15,7 +14,6 @@ export function useAuth() {
 
   useEffect(() => {
     const accessToken = sessionStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
 
     const tryRefresh = async () => {
       try {
@@ -32,23 +30,20 @@ export function useAuth() {
     if (accessToken) {
       setIsAuthenticated(true);
       setAuthChecked(true);
-    } else if (refreshToken) {
-      tryRefresh();
     } else {
-      setAuthChecked(true);
-      setIsAuthenticated(false);
+      tryRefresh();
     }
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
+    console.log('Logging in with', { email, password });
     const tokens = await loginApi(email, password);
     setTokens(tokens);
     setIsAuthenticated(true);
   }, []);
 
   const logout = useCallback(async () => {
-    const refreshToken = getRefreshToken();
-    if (refreshToken) await logoutApi(refreshToken);
+    await logoutApi();
     clearTokens();
     setIsAuthenticated(false);
   }, []);

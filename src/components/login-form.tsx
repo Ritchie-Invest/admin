@@ -16,6 +16,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { login } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +27,6 @@ export function LoginForm({
     setLoading(true)
     setError(null)
     try {
-      const { login } = useAuth()
       await login(email, password)
       window.location.href = "/"
     } catch (err) {
@@ -83,9 +83,6 @@ export function LoginForm({
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Connexion..." : "Login"}
-                </Button>
-                <Button variant="outline" className="w-full" disabled>
-                  Login with Google
                 </Button>
               </div>
             </div>
