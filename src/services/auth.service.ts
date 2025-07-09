@@ -2,7 +2,6 @@ import { API_BASE_URL } from '@/lib/api';
 
 export type AuthTokens = {
   accessToken: string;
-  refreshToken: string;
 };
 
 export type User = {
@@ -18,29 +17,28 @@ export async function login(
   const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) throw new Error('Login failed');
   return res.json();
 }
 
-export async function refresh(refreshToken: string): Promise<AuthTokens> {
+export async function refresh(): Promise<AuthTokens> {
   const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ refreshToken }),
   });
   if (!res.ok) throw new Error('Refresh token failed');
   return res.json();
 }
 
-export async function logout(refreshToken: string): Promise<void> {
+export async function logout(): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/auth/logout`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ refreshToken }),
   });
   if (!res.ok) throw new Error('Logout failed');
 }
@@ -49,28 +47,19 @@ function getAccessToken(): string | null {
   return sessionStorage.getItem('accessToken');
 }
 
-export function getRefreshToken(): string | null {
-  return localStorage.getItem('refreshToken');
-}
-
 export function setTokens(tokens: AuthTokens) {
   sessionStorage.setItem('accessToken', tokens.accessToken);
-  localStorage.setItem('refreshToken', tokens.refreshToken);
 }
 
 export function clearTokens() {
   sessionStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
 }
 
 let refreshPromise: Promise<AuthTokens> | null = null;
 
 export async function refreshSafe(): Promise<AuthTokens> {
   if (!refreshPromise) {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) throw new Error('No refresh token');
-
-    refreshPromise = refresh(refreshToken)
+    refreshPromise = refresh()
       .then((tokens) => {
         setTokens(tokens);
         return tokens;
@@ -97,9 +86,8 @@ export async function fetchWithAuth(
   }
 
   let accessToken = getAccessToken();
-  const refreshToken = getRefreshToken();
 
-  if (!accessToken && refreshToken) {
+  if (!accessToken) {
     try {
       await refreshSafe();
       accessToken = getAccessToken();
@@ -132,7 +120,7 @@ export async function fetchWithAuth(
 
   let res = await fetch(input, authInit);
 
-  if (res.status === 401 && refreshToken) {
+  if (res.status === 401) {
     try {
       await refreshSafe();
       accessToken = getAccessToken();
