@@ -8,7 +8,7 @@ export type Chapter = {
 };
 
 function getAuthHeaders(): Record<string, string> {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = sessionStorage.getItem('accessToken');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
