@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@/lib/api';
+import { fetchWithAuth } from './auth.service';
 
 export type Chapter = {
   id: string;
@@ -7,19 +8,10 @@ export type Chapter = {
   isPublished: boolean;
 };
 
-function getAuthHeaders(): Record<string, string> {
-  const accessToken = sessionStorage.getItem('accessToken');
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-  return headers;
-}
-
 export async function getChapters(): Promise<Chapter[]> {
-  const res = await fetch(`${API_BASE_URL}/chapters`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/chapters`, {
     method: 'GET',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to fetch chapters');
@@ -33,9 +25,9 @@ export async function createChapter(data: {
   title: string;
   description: string;
 }): Promise<Chapter> {
-  const res = await fetch(`${API_BASE_URL}/chapters`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/chapters`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(data),
   });
@@ -47,9 +39,9 @@ export async function updateChapter(
   chapterId: string,
   data: Partial<Pick<Chapter, 'title' | 'description' | 'isPublished'>>,
 ): Promise<Chapter> {
-  const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/chapters/${chapterId}`, {
     method: 'PUT',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(data),
   });
@@ -58,11 +50,54 @@ export async function updateChapter(
 }
 
 export async function getChapterById(chapterId: string): Promise<Chapter> {
-  const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
+  const res = await fetchWithAuth(`${API_BASE_URL}/chapters/${chapterId}`, {
     method: 'GET',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Chapter not found');
   return res.json();
+}
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+export function useChapters() {
+  return useQuery({
+    queryKey: ['chapters'],
+    queryFn: getChapters,
+  });
+}
+
+export function useCreateChapter() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createChapter,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chapters'] });
+    },
+  });
+}
+
+export function useUpdateChapter() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      chapterId,
+      data,
+    }: {
+      chapterId: string;
+      data: Partial<Pick<Chapter, 'title' | 'description' | 'isPublished'>>;
+    }) => updateChapter(chapterId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chapters'] });
+    },
+  });
+}
+
+export function useChapter(chapterId: string | undefined) {
+  return useQuery({
+    queryKey: ['chapter', chapterId],
+    queryFn: () => getChapterById(chapterId!),
+    enabled: !!chapterId,
+  });
 }

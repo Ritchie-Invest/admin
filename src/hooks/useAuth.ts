@@ -7,15 +7,16 @@ import {
   refreshSafe,
   getAccessToken,
 } from '@/services/auth.service';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useAuth() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const accessToken = getAccessToken();
-
     const tryRefresh = async () => {
       try {
         await refreshSafe();
@@ -27,7 +28,6 @@ export function useAuth() {
         setAuthChecked(true);
       }
     };
-
     if (accessToken) {
       setIsAuthenticated(true);
       setAuthChecked(true);
@@ -36,23 +36,41 @@ export function useAuth() {
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const tokens = await loginApi(email, password);
-    setTokens(tokens.accessToken);
-    setIsAuthenticated(true);
-  }, []);
+  const loginMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      const tokens = await loginApi(data.email, data.password);
+      setTokens(tokens.accessToken);
+      setIsAuthenticated(true);
+      setAuthChecked(true);
+      return tokens;
+    },
+    onSuccess: () => {
+      queryClient.clear();
+    },
+  });
 
-  const logout = useCallback(async () => {
-    await logoutApi();
-    clearTokens();
-    setIsAuthenticated(false);
-  }, []);
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await logoutApi();
+      clearTokens();
+      setIsAuthenticated(false);
+      setAuthChecked(true);
+    },
+    onSuccess: () => {
+      queryClient.clear();
+    },
+  });
 
   return {
-    login,
-    logout,
     authChecked,
     isAuthenticated,
+    login: (email: string, password: string) =>
+      loginMutation.mutateAsync({ email, password }),
+    logout: () => logoutMutation.mutateAsync(),
+    loginStatus: loginMutation.status,
+    loginError: loginMutation.error,
+    logoutStatus: logoutMutation.status,
+    logoutError: logoutMutation.error,
     fetchProtected: fetchWithAuth,
   };
 }
