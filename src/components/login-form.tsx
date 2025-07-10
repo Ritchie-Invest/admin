@@ -27,7 +27,7 @@ export function LoginForm({
     try {
       await login(email, password)
       window.location.href = "/"
-    } catch (err) {
+    } catch {
       setError("Email ou mot de passe invalide")
     }
   }
