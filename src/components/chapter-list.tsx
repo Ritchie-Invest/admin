@@ -24,13 +24,16 @@ export function ChapterList() {
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  async function handleCreate(e?: React.FormEvent) {
-    if (e) e.preventDefault();
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault();
     setFormError(null);
     createChapterMutation.mutate(
       { title, description },
       {
-        onError: (err: any) => setFormError(err?.message || 'Erreur inconnue'),
+        onError: (err: unknown) => {
+          if (err instanceof Error) setFormError(err.message);
+          else setFormError('Erreur inconnue');
+        },
         onSuccess: () => {
           setModalOpen(false);
           setTitle('');
@@ -41,7 +44,7 @@ export function ChapterList() {
   }
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-600">Error: {error?.toString()}</div>;
+  if (error) return <div className="text-red-600">Error: {error.toString()}</div>;
 
   return (
     <div>

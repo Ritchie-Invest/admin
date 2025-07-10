@@ -1,24 +1,18 @@
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getChapterById } from '@/services/chapter.service';
+import { useChapter } from '@/services/chapter.service';
 import { useLessonsByChapter } from '@/services/lesson.service';
 import { LessonCreateDialog } from '@/components/lesson-create-dialog';
+import type { Lesson } from '@/services/lesson.service';
 
 export function ChapterPage() {
-
   const { chapterId } = useParams();
-
-  const chapterQuery = useQuery({
-    queryKey: ['chapter', chapterId],
-    queryFn: () => getChapterById(chapterId!),
-    enabled: !!chapterId,
-  });
-
+  const chapterQuery = useChapter(chapterId);
   const lessonsQuery = useLessonsByChapter(chapterId);
 
   if (chapterQuery.isLoading || lessonsQuery.isLoading) return <div>Chargement...</div>;
   if (chapterQuery.error || lessonsQuery.error)
     return <div className="text-red-600">Erreur lors du chargement</div>;
+
   const chapter = chapterQuery.data;
   const lessons = lessonsQuery.data || [];
 
@@ -41,7 +35,7 @@ export function ChapterPage() {
       </div>
       <ul className="space-y-2 mb-6">
         {lessons.length === 0 && <li className="text-gray-500">Aucune leçon</li>}
-        {lessons.map((lesson: any) => (
+        {lessons.map((lesson: Lesson) => (
           <li key={lesson.id} className="border p-4 rounded">
             <div className="font-semibold">{lesson.title}</div>
             <div className="text-sm text-gray-600">{lesson.description}</div>

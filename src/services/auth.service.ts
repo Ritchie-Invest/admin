@@ -107,7 +107,7 @@ export async function fetchWithAuth(
     try {
       await refreshSafe();
       accessToken = getAccessToken();
-    } catch (e) {
+    } catch {
       clearAccessToken();
       window.location.href = '/login';
       throw new Error('Session expirée');
@@ -120,7 +120,7 @@ export async function fetchWithAuth(
     try {
       await refreshSafe();
       accessToken = getAccessToken();
-    } catch (e) {
+    } catch {
       clearAccessToken();
       window.location.href = '/login';
       throw new Error('Session expirée');
