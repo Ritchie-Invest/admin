@@ -3,6 +3,8 @@ import { useChapter } from '@/services/chapter.service';
 import { useLessonsByChapter } from '@/services/lesson.service';
 import { LessonCreateDialog } from '@/components/lesson-create-dialog';
 import type { Lesson } from '@/services/lesson.service';
+import { GameModuleList } from '@/components/game-module-list';
+import { GameModuleCreateDialog } from '@/components/game-module-create-dialog';
 
 export function ChapterPage() {
   const { chapterId } = useParams();
@@ -38,7 +40,11 @@ export function ChapterPage() {
         {lessons.map((lesson: Lesson) => (
           <li key={lesson.id} className="border p-4 rounded">
             <div className="font-semibold">{lesson.title}</div>
-            <div className="text-sm text-gray-600">{lesson.description}</div>
+            <div className="text-sm text-gray-600 mb-2">{lesson.description}</div>
+            <div className="mb-2">
+              <GameModuleCreateDialog lessonId={lesson.id} />
+            </div>
+            <GameModuleList lessonId={lesson.id} />
           </li>
         ))}
       </ul>
