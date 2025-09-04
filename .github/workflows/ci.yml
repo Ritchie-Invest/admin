@@ -73,6 +73,7 @@ jobs:
     env:
       IMAGE_NAME: ritchie-invest-admin
       REGISTRY: docker.io
+      VITE_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.PROD_API_BASE_URL || secrets.STAGING_API_BASE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -112,7 +113,9 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           build-args: |
             NODE_VERSION=22.16.0
+            VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}
 
       - name: Image tags (pushed or built)
         run: |
-          echo "Pushed tags: ${{ steps.meta.outputs.tags }}"
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
+          echo "VITE_API_BASE_URL utilisé: $VITE_API_BASE_URL"

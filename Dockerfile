@@ -8,9 +8,11 @@ COPY package.json pnpm-lock.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile
 
 FROM base AS build
+ARG VITE_API_BASE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN corepack enable && pnpm run build
 
 FROM nginx:1.27-alpine AS runner
