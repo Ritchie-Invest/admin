@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/lib/api';
+import { buildApiUrl } from '@/lib/api';
 
 export type AuthTokens = {
   accessToken: string;
@@ -26,7 +26,7 @@ export async function login(
   email: string,
   password: string,
 ): Promise<AuthTokens> {
-  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+  const res = await fetch(buildApiUrl('/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -37,7 +37,7 @@ export async function login(
 }
 
 export async function refresh(): Promise<AuthTokens> {
-  const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+  const res = await fetch(buildApiUrl('/auth/refresh'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -47,7 +47,7 @@ export async function refresh(): Promise<AuthTokens> {
 }
 
 export async function logout(): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/auth/logout`, {
+  const res = await fetch(buildApiUrl('/auth/logout'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -83,6 +83,13 @@ export async function fetchWithAuth(
       'fetchWithAuth ne doit pas être utilisé pour /auth/refresh ou /auth/login',
     );
   }
+  // Normalisation si URL relative (pas de schéma)
+  let finalInput: RequestInfo = input;
+  if (typeof finalInput === 'string' && !/^https?:\/\//i.test(finalInput)) {
+    finalInput = buildApiUrl(
+      finalInput.startsWith('/') ? finalInput : `/${finalInput}`,
+    );
+  }
 
   let accessToken = getAccessToken();
 
@@ -93,7 +100,7 @@ export async function fetchWithAuth(
       !Array.isArray(init.headers)
         ? { ...init.headers }
         : {};
-    return fetch(input, {
+    return fetch(finalInput, {
       ...init,
       headers: {
         ...baseHeaders,

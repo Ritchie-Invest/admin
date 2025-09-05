@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/lib/api';
+import { buildApiUrl } from '@/lib/api';
 import type { LessonFormValues } from '@/schemas/lesson.schema';
 import { fetchWithAuth } from './auth.service';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,7 +13,7 @@ export async function getLessonsByChapter(
   chapterId: string,
 ): Promise<Lesson[]> {
   const res = await fetchWithAuth(
-    `${API_BASE_URL}/lessons/chapter/${chapterId}`,
+    buildApiUrl(`/lessons/chapter/${chapterId}`),
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ export async function createLesson(
   chapterId: string,
   data: LessonFormValues,
 ): Promise<Lesson> {
-  const res = await fetchWithAuth(`${API_BASE_URL}/lessons`, {
+  const res = await fetchWithAuth(buildApiUrl('/lessons'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

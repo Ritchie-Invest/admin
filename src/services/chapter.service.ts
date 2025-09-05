@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/lib/api';
+import { buildApiUrl } from '@/lib/api';
 import { fetchWithAuth } from './auth.service';
 
 export type Chapter = {
@@ -9,7 +9,7 @@ export type Chapter = {
 };
 
 export async function getChapters(): Promise<Chapter[]> {
-  const res = await fetchWithAuth(`${API_BASE_URL}/chapters`, {
+  const res = await fetchWithAuth(buildApiUrl('/chapters'), {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -25,7 +25,7 @@ export async function createChapter(data: {
   title: string;
   description: string;
 }): Promise<Chapter> {
-  const res = await fetchWithAuth(`${API_BASE_URL}/chapters`, {
+  const res = await fetchWithAuth(buildApiUrl('/chapters'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -39,7 +39,7 @@ export async function updateChapter(
   chapterId: string,
   data: Partial<Pick<Chapter, 'title' | 'description' | 'isPublished'>>,
 ): Promise<Chapter> {
-  const res = await fetchWithAuth(`${API_BASE_URL}/chapters/${chapterId}`, {
+  const res = await fetchWithAuth(buildApiUrl(`/chapters/${chapterId}`), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -50,7 +50,7 @@ export async function updateChapter(
 }
 
 export async function getChapterById(chapterId: string): Promise<Chapter> {
-  const res = await fetchWithAuth(`${API_BASE_URL}/chapters/${chapterId}`, {
+  const res = await fetchWithAuth(buildApiUrl(`/chapters/${chapterId}`), {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
