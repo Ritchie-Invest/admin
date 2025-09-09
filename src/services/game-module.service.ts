@@ -2,11 +2,21 @@ import { API_BASE_URL } from '@/lib/api';
 import { fetchWithAuth } from './auth.service';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+export type McqContract = {
+  question: string;
+  choices: Array<{
+    id?: string;
+    text: string;
+    isCorrect: boolean;
+    correctionMessage?: string;
+  }>;
+};
+
 export type GameModule = {
   id: string;
   lessonId: string;
   gameType?: string;
-  contract?: any;
+  contract?: McqContract;
   order?: number;
   question?: string;
   choices?: Array<{

@@ -5,6 +5,15 @@ import { LessonCreateDialog } from '@/components/lesson-create-dialog';
 import type { Lesson } from '@/services/lesson.service';
 import { GameModuleList } from '@/components/game-module-list';
 import { GameModuleCreateDialog } from '@/components/game-module-create-dialog';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardAction,
+  CardContent,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export function ChapterPage() {
   const { chapterId } = useParams();
@@ -23,31 +32,41 @@ export function ChapterPage() {
   }
 
   return (
-    <div>
-      <div className="mb-4">
-        <Link to="/" className="inline-block text-sm text-black bg-gray-100 hover:bg-gray-200 rounded px-3 py-1 mb-2 transition-colors">
+    <div className="space-y-4">
+      <div>
+        <Link to="/" className="inline-block text-sm text-black bg-gray-100 hover:bg-gray-200 rounded px-3 py-1 transition-colors">
           ← Retour
         </Link>
       </div>
-      <h1 className="text-2xl font-bold mb-2">{chapter.title}</h1>
-      <p className="mb-6 text-gray-600">{chapter.description}</p>
-      <div className="flex items-center justify-between mb-2">
+      <div>
+        <h1 className="text-2xl font-bold">{chapter.title}</h1>
+        <p className="text-gray-600">{chapter.description}</p>
+      </div>
+      <Separator />
+      <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Leçons</h2>
         <LessonCreateDialog chapterId={chapterId!} />
       </div>
-      <ul className="space-y-2 mb-6">
-        {lessons.length === 0 && <li className="text-gray-500">Aucune leçon</li>}
+      <div className="space-y-4">
+        {lessons.length === 0 && (
+          <div className="text-gray-500">Aucune leçon</div>
+        )}
         {lessons.map((lesson: Lesson) => (
-          <li key={lesson.id} className="border p-4 rounded">
-            <div className="font-semibold">{lesson.title}</div>
-            <div className="text-sm text-gray-600 mb-2">{lesson.description}</div>
-            <div className="mb-2">
-              <GameModuleCreateDialog lessonId={lesson.id} />
-            </div>
-            <GameModuleList lessonId={lesson.id} />
-          </li>
+          <Card key={lesson.id}>
+            <CardHeader className="border-b">
+              <CardTitle className="text-lg">{lesson.title}</CardTitle>
+              <CardDescription>{lesson.description}</CardDescription>
+              <CardAction>
+                <GameModuleCreateDialog lessonId={lesson.id} />
+              </CardAction>
+            </CardHeader>
+            <CardContent className="py-4">
+              <div className="text-sm font-medium mb-2">Modules</div>
+              <GameModuleList lessonId={lesson.id} />
+            </CardContent>
+          </Card>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

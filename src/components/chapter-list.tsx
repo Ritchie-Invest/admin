@@ -98,7 +98,7 @@ export function ChapterList() {
       </div>
       <ul className="space-y-2">
         {chapters.map((chapter) => (
-          <li key={chapter.id} className="border p-4 rounded">
+          <li key={chapter.id} className="border p-4 rounded-lg">
             <Link to={`/chapters/${chapter.id}`} className="block hover:underline">
               <div className="font-semibold">{chapter.title}</div>
               <div className="text-sm text-gray-600">{chapter.description}</div>

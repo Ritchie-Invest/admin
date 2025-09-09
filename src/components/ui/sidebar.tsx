@@ -30,23 +30,14 @@ import {
   SIDEBAR_WIDTH_MOBILE,
   SIDEBAR_WIDTH_ICON,
   SIDEBAR_KEYBOARD_SHORTCUT,
-  SidebarContextProps,
 } from './sidebar-constants';
+import { SidebarContext, useSidebar } from './sidebar-context';
+import type { SidebarContextProps } from './sidebar-constants';
 import {
   sidebarMenuButtonVariants,
   type SidebarMenuButtonVariants,
 } from './sidebar-menu-variants';
 
-const SidebarContext = React.createContext<SidebarContextProps | null>(null);
-
-function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a SidebarProvider.');
-  }
-
-  return context;
-}
 
 function SidebarProvider({
   defaultOpen = true,
@@ -697,5 +688,4 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-  useSidebar,
 };
