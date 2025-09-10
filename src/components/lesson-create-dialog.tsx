@@ -37,7 +37,10 @@ export function LessonCreateDialog({ chapterId }: { chapterId: string }) {
         <Button className="bg-black text-white">+ Ajouter une leçon</Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
           <DialogHeader>
             <DialogTitle>Ajouter une leçon</DialogTitle>
           </DialogHeader>
@@ -45,21 +48,18 @@ export function LessonCreateDialog({ chapterId }: { chapterId: string }) {
             <Label htmlFor="title">Titre</Label>
             <Input id="title" {...form.register('title')} />
             {form.formState.errors.title && (
-              <span className="text-red-500 text-sm">{form.formState.errors.title.message}</span>
+              <span className="text-red-500 text-sm">
+                {form.formState.errors.title.message}
+              </span>
             )}
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="description">Description</Label>
             <Input id="description" {...form.register('description')} />
             {form.formState.errors.description && (
-              <span className="text-red-500 text-sm">{form.formState.errors.description.message}</span>
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="order">Ordre</Label>
-            <Input id="order" type="number" min={1} step={1} {...form.register('order')} />
-            {form.formState.errors.order && (
-              <span className="text-red-500 text-sm">{form.formState.errors.order.message}</span>
+              <span className="text-red-500 text-sm">
+                {form.formState.errors.description.message}
+              </span>
             )}
           </div>
           <DialogFooter>
@@ -67,7 +67,9 @@ export function LessonCreateDialog({ chapterId }: { chapterId: string }) {
               {createLessonMutation.isPending ? 'Ajout...' : 'Ajouter'}
             </Button>
             <DialogClose asChild>
-              <Button type="button" variant="outline">Annuler</Button>
+              <Button type="button" variant="outline">
+                Annuler
+              </Button>
             </DialogClose>
           </DialogFooter>
           {createLessonMutation.error && (
