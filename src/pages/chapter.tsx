@@ -1,5 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
-import { useChapter } from '@/services/chapter.service';
+import {
+  useChapter,
+  usePublishChapter,
+  useUnpublishChapter,
+} from '@/services/chapter.service';
 import { useLessonsByChapter } from '@/services/lesson.service';
 import { LessonCreateDialog } from '@/components/lesson-create-dialog';
 import type { Lesson } from '@/services/lesson.service';
@@ -14,13 +18,17 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button.tsx';
 
 export function ChapterPage() {
   const { chapterId } = useParams();
   const chapterQuery = useChapter(chapterId);
   const lessonsQuery = useLessonsByChapter(chapterId);
+  const publishChapterMutation = usePublishChapter(chapterId!);
+  const unpublishChapterMutation = useUnpublishChapter(chapterId!);
 
-  if (chapterQuery.isLoading || lessonsQuery.isLoading) return <div>Chargement...</div>;
+  if (chapterQuery.isLoading || lessonsQuery.isLoading)
+    return <div>Chargement...</div>;
   if (chapterQuery.error || lessonsQuery.error)
     return <div className="text-red-600">Erreur lors du chargement</div>;
 
@@ -34,13 +42,33 @@ export function ChapterPage() {
   return (
     <div className="space-y-4">
       <div>
-        <Link to="/" className="inline-block text-sm text-black bg-gray-100 hover:bg-gray-200 rounded px-3 py-1 transition-colors">
+        <Link
+          to="/"
+          className="inline-block text-sm text-black bg-gray-100 hover:bg-gray-200 rounded px-3 py-1 transition-colors"
+        >
           ← Retour
         </Link>
       </div>
       <div>
         <h1 className="text-2xl font-bold">{chapter.title}</h1>
         <p className="text-gray-600">{chapter.description}</p>
+      </div>
+      <div>
+        {chapter.isPublished ? (
+          <Button
+            onClick={() => unpublishChapterMutation.mutate()}
+            variant="outline"
+          >
+            Dépublier
+          </Button>
+        ) : (
+          <Button
+            onClick={() => publishChapterMutation.mutate()}
+            variant="outline"
+          >
+            Publier
+          </Button>
+        )}
       </div>
       <Separator />
       <div className="flex items-center justify-between">

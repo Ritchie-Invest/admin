@@ -40,7 +40,7 @@ export async function updateChapter(
   data: Partial<Pick<Chapter, 'title' | 'description' | 'isPublished'>>,
 ): Promise<Chapter> {
   const res = await fetchWithAuth(buildApiUrl(`/chapters/${chapterId}`), {
-    method: 'PUT',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(data),
@@ -90,6 +90,26 @@ export function useUpdateChapter() {
     }) => updateChapter(chapterId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chapters'] });
+    },
+  });
+}
+
+export function usePublishChapter(chapterId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => updateChapter(chapterId, { isPublished: true }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chapter', chapterId] });
+    },
+  });
+}
+
+export function useUnpublishChapter(chapterId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => updateChapter(chapterId, { isPublished: false }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chapter', chapterId] });
     },
   });
 }

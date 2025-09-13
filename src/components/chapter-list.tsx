@@ -39,12 +39,13 @@ export function ChapterList() {
           setTitle('');
           setDescription('');
         },
-      }
+      },
     );
   }
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-600">Error: {error.toString()}</div>;
+  if (error)
+    return <div className="text-red-600">Error: {error.toString()}</div>;
 
   return (
     <div>
@@ -66,7 +67,7 @@ export function ChapterList() {
                 <Input
                   id="chapter-title"
                   value={title}
-                  onChange={e => setTitle(e.target.value)}
+                  onChange={(e) => setTitle(e.target.value)}
                   required
                   disabled={createChapterMutation.isPending}
                 />
@@ -76,19 +77,28 @@ export function ChapterList() {
                 <Input
                   id="chapter-description"
                   value={description}
-                  onChange={e => setDescription(e.target.value)}
+                  onChange={(e) => setDescription(e.target.value)}
                   required
                   disabled={createChapterMutation.isPending}
                 />
               </div>
-              {formError && <div className="text-red-500 text-sm">{formError}</div>}
+              {formError && (
+                <div className="text-red-500 text-sm">{formError}</div>
+              )}
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline" disabled={createChapterMutation.isPending}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={createChapterMutation.isPending}
+                  >
                     Annuler
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={createChapterMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={createChapterMutation.isPending}
+                >
                   {createChapterMutation.isPending ? 'Création...' : 'Créer'}
                 </Button>
               </DialogFooter>
@@ -99,8 +109,14 @@ export function ChapterList() {
       <ul className="space-y-2">
         {chapters.map((chapter) => (
           <li key={chapter.id} className="border p-4 rounded-lg">
-            <Link to={`/chapters/${chapter.id}`} className="block hover:underline">
+            <Link
+              to={`/chapters/${chapter.id}`}
+              className="block hover:underline"
+            >
               <div className="font-semibold">{chapter.title}</div>
+              <div className="font-semibold text-sm leading-6 text-gray-700">
+                État : {chapter.isPublished ? 'Publié' : 'Brouillon'}
+              </div>
               <div className="text-sm text-gray-600">{chapter.description}</div>
             </Link>
           </li>
