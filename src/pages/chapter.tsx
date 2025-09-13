@@ -4,7 +4,11 @@ import {
   usePublishChapter,
   useUnpublishChapter,
 } from '@/services/chapter.service';
-import { useLessonsByChapter } from '@/services/lesson.service';
+import {
+  useLessonsByChapter,
+  usePublishLesson,
+  useUnpublishLesson,
+} from '@/services/lesson.service';
 import { LessonCreateDialog } from '@/components/lesson-create-dialog';
 import type { Lesson } from '@/services/lesson.service';
 import { GameModuleList } from '@/components/game-module-list';
@@ -26,6 +30,8 @@ export function ChapterPage() {
   const lessonsQuery = useLessonsByChapter(chapterId);
   const publishChapterMutation = usePublishChapter(chapterId!);
   const unpublishChapterMutation = useUnpublishChapter(chapterId!);
+  const publishLessonMutation = usePublishLesson(chapterId!);
+  const unpublishLessonMutation = useUnpublishLesson(chapterId!);
 
   if (chapterQuery.isLoading || lessonsQuery.isLoading)
     return <div>Chargement...</div>;
@@ -87,6 +93,23 @@ export function ChapterPage() {
               <CardAction>
                 <GameModuleCreateDialog lessonId={lesson.id} />
               </CardAction>
+              <div className={'mt-2'}>
+                {lesson.isPublished ? (
+                  <Button
+                    onClick={() => unpublishLessonMutation.mutate(lesson.id)}
+                    variant="outline"
+                  >
+                    Dépublier
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => publishLessonMutation.mutate(lesson.id)}
+                    variant="outline"
+                  >
+                    Publier
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="py-4">
               <div className="text-sm font-medium mb-2">Modules</div>
