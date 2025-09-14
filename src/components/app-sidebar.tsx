@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { IconDatabase, IconInnerShadowTop } from '@tabler/icons-react';
+import {
+  IconDatabase,
+  IconInnerShadowTop,
+  IconCoin,
+} from '@tabler/icons-react';
 
 import { NavContent } from '@/components/nav-content.tsx';
 import { NavUser } from '@/components/nav-user';
@@ -19,11 +23,16 @@ const data = {
     email: 'admin@ritchie-invest.com',
     avatar: '/avatars/shadcn.jpg',
   },
-  courses: [
+  main: [
     {
       name: 'Chapitres',
       url: '/',
       icon: IconDatabase,
+    },
+    {
+      name: 'Tickers',
+      url: '/tickers',
+      icon: IconCoin,
     },
   ],
 };
@@ -47,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavContent items={data.courses} />
+        <NavContent items={data.main} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

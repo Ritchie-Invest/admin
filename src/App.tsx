@@ -1,11 +1,18 @@
 import Dashboard from '@/pages/dashboard.tsx';
 import Login from '@/pages/login.tsx';
-import { BrowserRouter, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
 import { JSX } from 'react';
 import { ChapterPage } from '@/pages/chapter.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppLayout } from '@/components/app-layout';
 import { useAuth } from './hooks/useAuth';
+import Tickers from '@/pages/tickers.tsx';
 
 const queryClient = new QueryClient();
 
@@ -14,7 +21,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   const location = useLocation();
 
   if (!authChecked) return null;
-  if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!isAuthenticated)
+    return <Navigate to="/login" state={{ from: location }} replace />;
   return children;
 }
 
@@ -24,20 +32,36 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={
-            <RequireAuth>
-              <AppLayout>
-                <Dashboard />
-              </AppLayout>
-            </RequireAuth>
-          } />
-          <Route path="/chapters/:chapterId" element={
-            <RequireAuth>
-              <AppLayout>
-                <ChapterPage />
-              </AppLayout>
-            </RequireAuth>
-          } />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <AppLayout>
+                  <Dashboard />
+                </AppLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/chapters/:chapterId"
+            element={
+              <RequireAuth>
+                <AppLayout>
+                  <ChapterPage />
+                </AppLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/tickers"
+            element={
+              <RequireAuth>
+                <AppLayout>
+                  <Tickers />
+                </AppLayout>
+              </RequireAuth>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
