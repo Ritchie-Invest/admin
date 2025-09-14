@@ -1,59 +1,100 @@
-# React + TypeScript + Vite
+# 💸 Ritchie Invest Dashboard (React) 💸
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Administrative web interface for managing learning content of Ritchie Invest (chapters, lessons, and gamified
+multiple‑choice modules). Built with React + TypeScript and served as a static SPA (Vite build, Nginx container).
 
-Currently, two official plugins are available:
+> Scope: Content & structure management (chapters → lessons → MCQ game modules) and basic authenticated access. No
+> end‑user learning experience here (handled by other apps).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react)
-  uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc)
-  uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🧭 Table of Contents
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Tech Stack](#-tech-stack)
+- [Environment Variables](#-environment-variables)
+- [Getting Started (Local)](#-getting-started-local)
+- [Troubleshooting](#-troubleshooting)
+- [Authors](#-authors)
 
-```js
-export default tseslint.config({
-    extends: [
-        // Remove ...tseslint.configs.recommended and replace with this
-        ...tseslint.configs.recommendedTypeChecked,
-        // Alternatively, use this for stricter rules
-        ...tseslint.configs.strictTypeChecked,
-        // Optionally, add this for stylistic rules
-        ...tseslint.configs.stylisticTypeChecked,
-    ],
-    languageOptions: {
-        // other options...
-        parserOptions: {
-            project: ['./tsconfig.node.json', './tsconfig.app.json'],
-            tsconfigRootDir: import.meta.dirname,
-        },
-    },
-})
+---
+
+## 💻 Tech Stack
+
+- Framework: React 19
+- Language: TypeScript 5
+- Bundler / Dev Server: Vite 6
+- Styling: Tailwind CSS 4 (via `@tailwindcss/vite` plugin)
+- Forms & Validation: `react-hook-form` + `zod`
+- Data Fetching / Caching: TanStack Query 5
+- Tables: TanStack Table 8
+- Routing: React Router 7
+- UI Primitives: Radix UI components
+- Charts: Recharts
+- Drag & Drop: DnD Kit
+- Notifications: Sonner
+- Auth (frontend): sessionStorage access token + refresh via `fetch` with `credentials: 'include'`
+- Package Manager: pnpm (Node >= 22.16.0)
+
+---
+
+## 🚀 Getting Started (Local)
+
+1. Clone the repository:
+
+```bash
+git clone <repo-url>
+cd ritchie-invest-admin
+``` 
+
+2. Install dependencies:
+
+```bash
+pnpm install
 ```
 
-You can also
-install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x)
-and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom)
-for React-specific lint rules:
+3. Copy environment template:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+cp .env.example .env
 
-export default tseslint.config({
-    plugins: {
-        // Add the react-x and react-dom plugins
-        'react-x': reactX,
-        'react-dom': reactDom,
-    },
-    rules: {
-        // other rules...
-        // Enable its recommended typescript rules
-        ...reactX.configs['recommended-typescript'].rules,
-        ...reactDom.configs.recommended.rules,
-    },
-})
+# Edit values as needed
 ```
+
+4. Start dev server:
+
+```bash
+pnpm dev
+```
+
+5. Access at http://localhost:5173
+
+---
+
+## 🔧 Environment Variables
+
+Defined in `.env.example` (copy to `.env`).
+
+| Name                | Required            | Purpose                                                                            | Default (fallback in code) |
+|---------------------|---------------------|------------------------------------------------------------------------------------|----------------------------|
+| `VITE_API_BASE_URL` | Yes (for non-local) | Base URL of the backend API (protocol added if missing; trailing slashes trimmed). | `http://localhost:3000`    |
+
+---
+
+## 🐛 Troubleshooting
+
+| Symptom                  | Hint                                                                                           |
+|--------------------------|------------------------------------------------------------------------------------------------|
+| 401 loops then redirect  | Backend refresh endpoint failing or cookies blocked (check CORS + `credentials`).              |
+| Empty lists after create | Ensure backend returns either raw array or wrapped array as expected.                          |
+| Wrong API base URL       | Confirm `VITE_API_BASE_URL` (watch for missing protocol; code auto-adds `https://` if absent). |
+
+---
+
+## 👤 Authors
+
+- Maxence BREUILLES ([@MisterAzix](https://github.com/MisterAzix))
+- Benoît FAVRIE ([@benoitfvr](https://github.com/benoitfvr))
+- Doriane FARAU ([@DFarau](https://github.com/DFarau))
+- Charles LAMBRET ([@CharlesLambret](https://github.com/CharlesLambret))
+- Antonin CHARPENTIER ([@toutouff](https://github.com/toutouff))
+
