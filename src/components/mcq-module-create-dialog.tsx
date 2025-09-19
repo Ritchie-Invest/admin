@@ -1,10 +1,21 @@
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { useCreateGameModule, McqGameModuleFormValues } from '@/services/game-module.service';
+import {
+  useCreateGameModule,
+  McqGameModuleFormValues,
+} from '@/services/game-module.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
 const defaultValues: McqGameModuleFormValues = {
@@ -16,7 +27,7 @@ const defaultValues: McqGameModuleFormValues = {
   ],
 };
 
-export function GameModuleCreateDialog({ lessonId }: { lessonId: string }) {
+export function McqModuleCreateDialog({ lessonId }: { lessonId: string }) {
   const [open, setOpen] = useState(false);
   const form = useForm<McqGameModuleFormValues>({
     defaultValues,
@@ -70,8 +81,11 @@ export function GameModuleCreateDialog({ lessonId }: { lessonId: string }) {
       <DialogTrigger asChild>
         <Button variant="outline">+ Ajouter un module MCQ</Button>
       </DialogTrigger>
-  <DialogContent className="sm:max-w-[640px] max-h-[85vh] overflow-y-auto">
-  <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <DialogContent className="sm:max-w-[640px] max-h-[85vh] overflow-y-auto">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-5"
+        >
           <DialogHeader>
             <DialogTitle>Ajouter un QCM</DialogTitle>
           </DialogHeader>
@@ -81,17 +95,23 @@ export function GameModuleCreateDialog({ lessonId }: { lessonId: string }) {
             <Input
               id="question"
               placeholder="Saisissez la question"
-              {...form.register('question', { required: 'La question est requise' })}
+              {...form.register('question', {
+                required: 'La question est requise',
+              })}
               aria-invalid={!!form.formState.errors.question}
             />
             {form.formState.errors.question && (
-              <p className="text-red-500 text-xs">{form.formState.errors.question.message as string}</p>
+              <p className="text-red-500 text-xs">
+                {form.formState.errors.question.message as string}
+              </p>
             )}
           </div>
 
           <fieldset className="flex flex-col gap-3">
             <legend className="text-sm font-medium">Choix</legend>
-            <p className="text-xs text-muted-foreground">Au moins deux choix non vides et une réponse correcte.</p>
+            <p className="text-xs text-muted-foreground">
+              Au moins deux choix non vides et une réponse correcte.
+            </p>
             {fields.map((field, idx) => (
               <div key={field.id} className="rounded border p-3 space-y-3">
                 <div className="flex items-center gap-2">
@@ -99,25 +119,40 @@ export function GameModuleCreateDialog({ lessonId }: { lessonId: string }) {
                     name={`choices.${idx}.isCorrect`}
                     control={form.control}
                     render={({ field: f }) => (
-                      <Checkbox id={`choice-correct-${idx}`} checked={!!f.value} onCheckedChange={(v) => f.onChange(!!v)} />
+                      <Checkbox
+                        id={`choice-correct-${idx}`}
+                        checked={!!f.value}
+                        onCheckedChange={(v) => f.onChange(!!v)}
+                      />
                     )}
                   />
                   <Label htmlFor={`choice-correct-${idx}`}>Correct</Label>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor={`choice-text-${idx}`}>Texte du choix #{idx + 1}</Label>
+                  <Label htmlFor={`choice-text-${idx}`}>
+                    Texte du choix #{idx + 1}
+                  </Label>
                   <Input
                     id={`choice-text-${idx}`}
                     placeholder={`Texte du choix #${idx + 1}`}
-                    {...form.register(`choices.${idx}.text`, { required: 'Le texte est requis' })}
+                    {...form.register(`choices.${idx}.text`, {
+                      required: 'Le texte est requis',
+                    })}
                     aria-invalid={!!form.formState.errors.choices?.[idx]?.text}
                   />
                   {form.formState.errors.choices?.[idx]?.text?.message && (
-                    <p className="text-red-500 text-xs mt-1">{form.formState.errors.choices?.[idx]?.text?.message as string}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {
+                        form.formState.errors.choices?.[idx]?.text
+                          ?.message as string
+                      }
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor={`choice-correction-${idx}`}>Message de correction (optionnel)</Label>
+                  <Label htmlFor={`choice-correction-${idx}`}>
+                    Message de correction (optionnel)
+                  </Label>
                   <Input
                     id={`choice-correction-${idx}`}
                     placeholder="Explication affichée après la réponse"
@@ -141,7 +176,9 @@ export function GameModuleCreateDialog({ lessonId }: { lessonId: string }) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => append({ text: '', isCorrect: false, correctionMessage: '' })}
+                onClick={() =>
+                  append({ text: '', isCorrect: false, correctionMessage: '' })
+                }
               >
                 + Ajouter un choix
               </Button>
@@ -152,7 +189,13 @@ export function GameModuleCreateDialog({ lessonId }: { lessonId: string }) {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={createMutation.isPending}>Annuler</Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={createMutation.isPending}
+              >
+                Annuler
+              </Button>
             </DialogClose>
             <Button type="submit" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Ajout…' : 'Ajouter'}

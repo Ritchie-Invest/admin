@@ -12,7 +12,7 @@ import {
 import { LessonCreateDialog } from '@/components/lesson-create-dialog';
 import type { Lesson } from '@/services/lesson.service';
 import { GameModuleList } from '@/components/game-module-list';
-import { GameModuleCreateDialog } from '@/components/game-module-create-dialog';
+import { McqModuleCreateDialog } from '@/components/mcq-module-create-dialog.tsx';
 import {
   Card,
   CardHeader,
@@ -23,6 +23,8 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button.tsx';
+import { FillInTheBlankModuleCreateDialog } from '@/components/fill-in-the-blank-module-create-dialog.tsx';
+import { TrueOrFalseModuleCreateDialog } from '@/components/true-or-false-module-create-dialog.tsx';
 
 export function ChapterPage() {
   const { chapterId } = useParams();
@@ -32,6 +34,10 @@ export function ChapterPage() {
   const unpublishChapterMutation = useUnpublishChapter(chapterId!);
   const publishLessonMutation = usePublishLesson(chapterId!);
   const unpublishLessonMutation = useUnpublishLesson(chapterId!);
+  const isFillInTheBlankAvailable: boolean =
+    import.meta.env.VITE_FILL_IN_THE_BLANK_MODULE_ENABLED === 'true' || false;
+  const isTrueOrFalseAvailable: boolean =
+    import.meta.env.VITE_TRUE_OR_FALSE_MODULE_ENABLED === 'true' || false;
 
   if (chapterQuery.isLoading || lessonsQuery.isLoading)
     return <div>Chargement...</div>;
@@ -91,23 +97,31 @@ export function ChapterPage() {
               <CardTitle className="text-lg">{lesson.title}</CardTitle>
               <CardDescription>{lesson.description}</CardDescription>
               <CardAction>
-                <GameModuleCreateDialog lessonId={lesson.id} />
+                <div>
+                  {lesson.isPublished ? (
+                    <Button
+                      onClick={() => unpublishLessonMutation.mutate(lesson.id)}
+                      variant="outline"
+                    >
+                      Dépublier
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => publishLessonMutation.mutate(lesson.id)}
+                      variant="outline"
+                    >
+                      Publier
+                    </Button>
+                  )}
+                </div>
               </CardAction>
-              <div className={'mt-2'}>
-                {lesson.isPublished ? (
-                  <Button
-                    onClick={() => unpublishLessonMutation.mutate(lesson.id)}
-                    variant="outline"
-                  >
-                    Dépublier
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => publishLessonMutation.mutate(lesson.id)}
-                    variant="outline"
-                  >
-                    Publier
-                  </Button>
+              <div className="space-x-2 space-y-2 mt-4">
+                <McqModuleCreateDialog lessonId={lesson.id} />
+                {isFillInTheBlankAvailable && (
+                  <FillInTheBlankModuleCreateDialog lessonId={lesson.id} />
+                )}
+                {isTrueOrFalseAvailable && (
+                  <TrueOrFalseModuleCreateDialog lessonId={lesson.id} />
                 )}
               </div>
             </CardHeader>
